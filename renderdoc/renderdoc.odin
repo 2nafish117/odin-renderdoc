@@ -4,6 +4,7 @@ package renderdoc
 // from https://github.com/baldurk/renderdoc/blob/v1.x/renderdoc/api/app/renderdoc_app.h 
 // using bindgen https://github.com/Breush/odin-binding-generator
 // most comments have been copied over for convinience, but some may be incorrect, refer the original header file for more accurate info
+// also check the docs: https://renderdoc.org/docs/in_application_api.html
 
 import "core:c"
 import "base:runtime"
@@ -554,6 +555,13 @@ RENDERDOC_API_1_4_0 :: RENDERDOC_API_1_6_0
 RENDERDOC_API_1_4_1 :: RENDERDOC_API_1_6_0
 RENDERDOC_API_1_4_2 :: RENDERDOC_API_1_6_0
 RENDERDOC_API_1_5_0 :: RENDERDOC_API_1_6_0
+
+// TODOS:
+// 1. check more functionality
+// 2. remove prefixes
+// 3. remove deprecated stuff
+// 4. compiler flag to strip renderdoc loading 
+// 5. implement bindings for recording api as well?
 
 // utility to load renderdoc 
 load_api :: proc(dll_path: string = "renderdoc.dll", version: RENDERDOC_Version = .eRENDERDOC_API_Version_1_6_0) -> (lib: dynlib.Library, rdoc_api: rawptr, ok: bool) {
