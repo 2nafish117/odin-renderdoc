@@ -557,7 +557,7 @@ RENDERDOC_API_1_4_2 :: RENDERDOC_API_1_6_0
 RENDERDOC_API_1_5_0 :: RENDERDOC_API_1_6_0
 
 // TODOS:
-// 1. check more functionality
+// 1. test functionality
 // 2. remove prefixes
 // 3. remove deprecated stuff
 // 4. compiler flag to strip renderdoc loading 
