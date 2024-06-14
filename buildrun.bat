@@ -1,6 +1,6 @@
 @echo off
 
-odin build . -out:bin/odin-renderdoc.exe -debug
+odin build example -out:bin/odin-renderdoc.exe -debug
 
 if %errorlevel% neq 0 exit echo Build failed. && /b %errorlevel%
 
