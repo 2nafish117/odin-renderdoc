@@ -528,12 +528,6 @@ RENDERDOC_API_1_4_1 :: RENDERDOC_API_1_6_0
 RENDERDOC_API_1_4_2 :: RENDERDOC_API_1_6_0
 RENDERDOC_API_1_5_0 :: RENDERDOC_API_1_6_0
 
-// TODOS:
-// 1. test functionality
-// 2. remove prefixes
-// 4. compiler flag to strip renderdoc loading 
-// 5. implement bindings for recording api as well?
-
 // utility to load renderdoc 
 load_api :: proc(renderdoc_install_root: string = "C:/Program Files/RenderDoc", version: RENDERDOC_Version = .eRENDERDOC_API_Version_1_6_0) -> (lib: dynlib.Library, rdoc_api: rawptr, ok: bool) {
 	dll_path := filepath.join([]string{renderdoc_install_root, "renderdoc.dll"}, context.temp_allocator)
@@ -569,7 +563,7 @@ load_api :: proc(renderdoc_install_root: string = "C:/Program Files/RenderDoc", 
 // utility to unload renderdoc
 unload_api :: proc(lib: dynlib.Library) {
 	// @TODO: cleanup rome rdoc things?
-// @TODO: check if lib is valid to unload it?
+	// @TODO: check if lib is valid to unload it?
 	did_unload := dynlib.unload_library(lib)
 	if !did_unload {
 		log.errorf("error unloading lib %v", lib)
