@@ -1,12 +1,12 @@
 package main
 
+import "base:runtime"
 import "core:log"
 import "core:fmt"
-import "base:runtime"
 import "core:c"
-import "vendor:glfw"
 import "core:os"
 import "core:path/filepath"
+import "vendor:glfw"
 import gl "vendor:OpenGL"
 
 import rdoc ".."
@@ -35,7 +35,7 @@ KeyCallback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods:
 	}
 }
 
-LaunchOrShowRenderdocUI :: proc(rdoc_api: ^rdoc.RENDERDOC_API_1_6_0) {
+LaunchOrShowRenderdocUI :: proc(rdoc_api: ^rdoc.API_1_6_0) {
 	latest_capture_index := rdoc_api.GetNumCaptures() - 1
 		
 	if latest_capture_index < 0 {
@@ -77,7 +77,7 @@ main :: proc() {
 	context.logger = log.create_console_logger()
 
 	rdoc_lib, rawptr_rdoc_api, rdoc_ok := rdoc.load_api()
-	rdoc_api := cast(^rdoc.RENDERDOC_API_1_6_0) rawptr_rdoc_api
+	rdoc_api := cast(^rdoc.API_1_6_0) rawptr_rdoc_api
 	if rdoc_ok {
 		log.infof("loaded renderdoc %v", rdoc_api)
 	}
