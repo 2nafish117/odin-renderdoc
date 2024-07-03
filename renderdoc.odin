@@ -30,7 +30,7 @@ ShaderDebugMagicValue : u64 : 0x48656670eab25520
 // Returns 1 if the option and value are valid
 // Returns 0 if either is invalid and the option is unchanged
 SetCaptureOptionU32Proc :: #type proc "c" (opt : CaptureOption, val : u32) -> c.int
-SetCaptureOptionF32Proc :: #type proc "c" (opt : CaptureOption, val : c.float) -> c.int
+SetCaptureOptionF32Proc :: #type proc "c" (opt : CaptureOption, val : f32) -> c.int
 
 // Gets the current value of an option as a uint32_t
 //
@@ -40,7 +40,7 @@ GetCaptureOptionU32Proc :: #type proc "c" (opt : CaptureOption) -> u32
 // Gets the current value of an option as a float
 //
 // If the option is invalid, -FLT_MAX is returned
-GetCaptureOptionF32Proc :: #type proc "c" (opt : CaptureOption) -> c.float
+GetCaptureOptionF32Proc :: #type proc "c" (opt : CaptureOption) -> f32
 
 // Sets which key or keys can be used to toggle focus between multiple windows
 //
