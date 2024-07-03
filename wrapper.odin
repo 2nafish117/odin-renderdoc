@@ -7,7 +7,7 @@ import "core:math"
 import "core:path/filepath"
 import "core:os"
 
-LOAD_RENDERDOC :: true
+LOAD_RENDERDOC :: #config(LOAD_RENDERDOC, true)
 
 // utility to load renderdoc, pass in the path to renderdoc if not installed at the default path
 load_api :: proc(renderdoc_install_root: string = "C:/Program Files/RenderDoc", version: Version = .API_Version_1_6_0) -> (lib: dynlib.Library, rdoc_api: rawptr, ok: bool) {
