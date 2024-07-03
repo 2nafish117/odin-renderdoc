@@ -7,11 +7,6 @@ package renderdoc
 // also check the docs: https://renderdoc.org/docs/in_application_api.html
 
 import "core:c"
-import "base:runtime"
-import "core:dynlib"
-import "core:log"
-import "core:path/filepath"
-import "core:os"
 
 // required only for DEVICEPOINTER_FROM_VKINSTANCE
 import vk "vendor:vulkan"
@@ -527,41 +522,3 @@ API_1_4_0 :: API_1_6_0
 API_1_4_1 :: API_1_6_0
 API_1_4_2 :: API_1_6_0
 API_1_5_0 :: API_1_6_0
-
-// utility to load renderdoc 
-load_api :: proc(renderdoc_install_root: string = "C:/Program Files/RenderDoc", version: Version = .API_Version_1_6_0) -> (lib: dynlib.Library, rdoc_api: rawptr, ok: bool) {
-	dll_path := filepath.join([]string{renderdoc_install_root, "renderdoc.dll"}, context.temp_allocator)
-	defer delete(dll_path, context.temp_allocator)
-
-	if !os.exists(renderdoc_install_root) {
-		log.errorf("renderdoc install root %v doesnt exist", renderdoc_install_root)
-		return nil, nil, false
-	}
-
-	rdoc_lib, did_load := dynlib.load_library(dll_path)
-	if !did_load {
-		log.errorf("could not load %v, reason: %v", dll_path, dynlib.last_error())
-		return nil, nil, false
-	}
-	
-	GET_API_SYMBOL :: "RENDERDOC_GetAPI"
-	symbol_ptr, found := dynlib.symbol_address(rdoc_lib, GET_API_SYMBOL)
-	if !found {
-		log.errorf("could not find symbol %v in %v, %v", GET_API_SYMBOL, dll_path, dynlib.last_error())
-		return nil, nil, false
-	}
-
-	GetAPI: GetAPIProc = cast(GetAPIProc) symbol_ptr
-
-	GetAPI(version, &rdoc_api)
-
-	return rdoc_lib, rdoc_api, true
-}
-
-// utility to unload renderdoc
-unload_api :: proc(lib: dynlib.Library) {
-	did_unload := dynlib.unload_library(lib)
-	if !did_unload {
-		log.errorf("error unloading lib %v, reason: %v", lib, dynlib.last_error())
-	}
-}

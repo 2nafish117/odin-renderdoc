@@ -36,7 +36,7 @@ KeyCallback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods:
 }
 
 LaunchOrShowRenderdocUI :: proc(rdoc_api: ^rdoc.API_1_6_0) {
-	latest_capture_index := rdoc_api.GetNumCaptures() - 1
+	latest_capture_index := rdoc.GetNumCaptures(rdoc_api) - 1
 		
 	if latest_capture_index < 0 {
 		return
@@ -47,7 +47,7 @@ LaunchOrShowRenderdocUI :: proc(rdoc_api: ^rdoc.API_1_6_0) {
 	defer delete(capture_file_path, context.temp_allocator)
 	capture_file_path_len: u32
 
-	if rdoc_api.GetCapture(latest_capture_index, transmute(cstring)raw_data(capture_file_path), &capture_file_path_len, &timestamp) != 0 {
+	if rdoc.GetCapture(rdoc_api, latest_capture_index, transmute(cstring)raw_data(capture_file_path), &capture_file_path_len, &timestamp) != 0 {
 		assert(capture_file_path_len < 512, "too long capture path!!")
 		current_directory := os.get_current_directory(context.temp_allocator)
 		defer delete(current_directory, context.temp_allocator)
@@ -57,10 +57,10 @@ LaunchOrShowRenderdocUI :: proc(rdoc_api: ^rdoc.API_1_6_0) {
 
 		log.infof("loading latest capture: %v", abs_capture_path)
 		
-		if rdoc_api.IsTargetControlConnected() == 1 {
-			rdoc_api.ShowReplayUI()
+		if rdoc.IsTargetControlConnected(rdoc_api) {
+			rdoc.ShowReplayUI(rdoc_api)
 		} else {
-			pid := rdoc_api.LaunchReplayUI(1, transmute(cstring)raw_data(abs_capture_path))
+			pid := rdoc.LaunchReplayUI(rdoc_api, 1, transmute(cstring)raw_data(abs_capture_path))
 			if pid == 0 {
 				log.error("couldn't launch Renderdoc UI")
 				return
@@ -76,16 +76,20 @@ LaunchOrShowRenderdocUI :: proc(rdoc_api: ^rdoc.API_1_6_0) {
 main :: proc() {
 	context.logger = log.create_console_logger()
 
-	rdoc_lib, rawptr_rdoc_api, rdoc_ok := rdoc.load_api()
+	// pass in the path to renderdoc if not installed in default location of "C:/Program Files/RenderDoc"
+	rdoc_lib, rawptr_rdoc_api, rdoc_ok := rdoc.load_api(/*"C:/Program Files/RenderDoc"*/)
 	rdoc_api := cast(^rdoc.API_1_6_0) rawptr_rdoc_api
 	if rdoc_ok {
 		log.infof("loaded renderdoc %v", rdoc_api)
+	} else {
+		log.warn("couldnt load renderdoc")
 	}
+	defer rdoc.unload_api(rdoc_lib)
 
-	rdoc_api.SetCaptureFilePathTemplate("captures/capture.rdc")
+	rdoc.SetCaptureFilePathTemplate(rdoc_api, "captures/capture.rdc")
 
 	// if you want to disable default behaviour of renderdoc capture keys
-	// rdoc_api.SetCaptureKeys(nil, 0)
+	// rdoc.SetCaptureKeys(rdoc_api, nil, 0)
 	
 	if !glfw.Init() {
 		return
@@ -168,37 +172,36 @@ main :: proc() {
 		
 		// rendering scope for rdoc
 		{
+			if rdoc_stage == .LaunchUI {
+				if !rdoc.IsFrameCapturing(rdoc_api) {
+					LaunchOrShowRenderdocUI(rdoc_api)
+					rdoc_stage = .None
+				} else {
+					log.info("waiting for capture to complete")
+				}
+			}
+
 			// capture with StartFrameCapture/EndFrameCapture
 			if rdoc_stage == .Capture {
 				log.info("starting frame capture")
-				rdoc_api.StartFrameCapture(nil, nil)
+				rdoc.StartFrameCapture(rdoc_api, nil, nil)
 			}
 			defer if rdoc_stage == .Capture {
 				log.info("ending frame capture")
-				rdoc_api.EndFrameCapture(nil, nil)
+				rdoc.EndFrameCapture(rdoc_api, nil, nil)
 				rdoc_stage = .LaunchUI
 			}
 
 			// or capture with TriggerCapture
 			if rdoc_stage == .Trigger {
 				log.info("triggering frame capture")
-				rdoc_api.TriggerCapture()
+				rdoc.TriggerCapture(rdoc_api)
 				rdoc_stage = .LaunchUI
 			}
 			if rdoc_stage == .TriggerMulti {
-				// @TODO: triggerring multi captures as your first capture doesnt open the Renderdoc UI
 				log.info("triggering 10 frame captures")
-				rdoc_api.TriggerMultiFrameCapture(10)
+				rdoc.TriggerMultiFrameCapture(rdoc_api, 10)
 				rdoc_stage = .LaunchUI
-			}
-
-			if rdoc_stage == .LaunchUI {
-				if rdoc_api.IsFrameCapturing() == 0 {
-					LaunchOrShowRenderdocUI(rdoc_api)
-					rdoc_stage = .None
-				} else {
-					log.info("waiting for capture to complete")
-				}
 			}
 
 			gl.Clear(gl.COLOR_BUFFER_BIT)
@@ -214,7 +217,4 @@ main :: proc() {
 
 	glfw.DestroyWindow(window_handle)
 	glfw.Terminate()
-
-	rdoc.unload_api(rdoc_lib)
-	log.infof("unloaded renderdoc")
 }
