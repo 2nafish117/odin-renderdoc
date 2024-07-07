@@ -87,7 +87,7 @@ main :: proc() {
 
 	rdoc.SetCaptureFilePathTemplate(rdoc_api, "captures/capture.rdc")
 
-	// if you want to disable default behaviour of renderdoc capture keys
+	// uncomment if you want to disable default behaviour of renderdoc capture keys
 	// rdoc.SetCaptureKeys(rdoc_api, nil, 0)
 	
 	if !glfw.Init() {
