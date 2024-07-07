@@ -67,8 +67,7 @@ LaunchOrShowRenderdocUI :: proc(rdoc_api: ^rdoc.API_1_6_0) {
 			}
 			log.infof("launched Renderdoc UI pid(%v)", pid)
 		}
-	}
-	else {
+	} else {
 		log.warnf("no valid capture exists to load")
 	}
 }
@@ -106,7 +105,7 @@ main :: proc() {
 	}
 	
 	glfw.MakeContextCurrent(window_handle)
-	gl.load_up_to(4, 5, glfw.gl_set_proc_address);
+	gl.load_up_to(4, 5, glfw.gl_set_proc_address)
 
 	glfw.SwapInterval(1)
 	glfw.SetKeyCallback(window_handle, KeyCallback)
@@ -212,7 +211,7 @@ main :: proc() {
 			glfw.SwapBuffers(window_handle)
 		}
 
-		glfw.PollEvents();
+		glfw.PollEvents()
 	}
 
 	glfw.DestroyWindow(window_handle)
