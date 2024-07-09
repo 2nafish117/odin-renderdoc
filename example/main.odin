@@ -35,7 +35,7 @@ KeyCallback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods:
 	}
 }
 
-LaunchOrShowRenderdocUI :: proc(rdoc_api: ^rdoc.API_1_6_0) {
+LaunchOrShowRenderdocUI :: proc(rdoc_api: rawptr) {
 	latest_capture_index := rdoc.GetNumCaptures(rdoc_api) - 1
 		
 	if latest_capture_index < 0 {
@@ -76,8 +76,9 @@ main :: proc() {
 	context.logger = log.create_console_logger()
 
 	// pass in the path to renderdoc if not installed in default location of "C:/Program Files/RenderDoc"
-	rdoc_lib, rawptr_rdoc_api, rdoc_ok := rdoc.load_api(/*"C:/Program Files/RenderDoc"*/)
-	rdoc_api := cast(^rdoc.API_1_6_0) rawptr_rdoc_api
+	rdoc_lib, rdoc_api, rdoc_ok := rdoc.load_api(/*"C:/Program Files/RenderDoc"*/)
+	// cast to a specific api struct to directly use the api, without the wrapper
+	// typed_rdoc_api := cast(^rdoc.API_1_6_0) rdoc_api
 	if rdoc_ok {
 		log.infof("loaded renderdoc %v", rdoc_api)
 	} else {
