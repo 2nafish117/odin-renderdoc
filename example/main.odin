@@ -204,6 +204,10 @@ main :: proc() {
 				rdoc_stage = .LaunchUI
 			}
 
+			// use PushDebugGroup to get custom grouping in renderdoc
+			gl.PushDebugGroup(gl.DEBUG_SOURCE_APPLICATION, 0, len("CUSTOM GROUP"), "CUSTOM GROUP")
+			defer gl.PopDebugGroup()
+			
 			gl.Clear(gl.COLOR_BUFFER_BIT)
 			
 			gl.BindVertexArray(vao)
