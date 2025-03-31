@@ -120,24 +120,24 @@ GetCaptureOptionF32 :: proc "c" (rdoc_api: rawptr, opt : CaptureOption) -> f32 {
 //
 // If keys is NULL or num is 0, toggle keys will be disabled
 @(disabled = !LOAD_RENDERDOC)
-SetFocusToggleKeys :: proc "c" (rdoc_api: rawptr, keys : ^InputButton, num : c.int) {
+SetFocusToggleKeys :: proc "c" (rdoc_api: rawptr, keys : []InputButton) {
 	if rdoc_api == nil {
 		return
 	}
 	rdoc_api_internal := cast(^API_1_6_0) rdoc_api
-	rdoc_api_internal.SetFocusToggleKeys(keys, num)
+	rdoc_api_internal.SetFocusToggleKeys(raw_data(keys), cast(i32) len(keys))
 }
 
 // Sets which key or keys can be used to capture the next frame
 //
 // If keys is NULL or num is 0, captures keys will be disabled
 @(disabled = !LOAD_RENDERDOC)
-SetCaptureKeys :: proc "c" (rdoc_api: rawptr, keys : ^InputButton, num : c.int) {
+SetCaptureKeys :: proc "c" (rdoc_api: rawptr, keys : []InputButton) {
 	if rdoc_api == nil {
 		return
 	}
 	rdoc_api_internal := cast(^API_1_6_0) rdoc_api
-	rdoc_api_internal.SetCaptureKeys(keys, num)
+	rdoc_api_internal.SetCaptureKeys(raw_data(keys), cast(i32) len(keys))
 }
 
 // returns the overlay bits that have been set

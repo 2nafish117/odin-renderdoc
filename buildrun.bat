@@ -1,6 +1,8 @@
 @echo off
 
-odin build example -out:bin/odin-renderdoc.exe -strict-style -debug
+mkdir bin
+
+odin build example -out:bin/odin-renderdoc.exe -vet -strict-style -vet-tabs -disallow-do -warnings-as-errors -debug
 
 if %errorlevel% neq 0 exit echo Build failed. && /b %errorlevel%
 

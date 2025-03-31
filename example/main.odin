@@ -1,8 +1,6 @@
 package main
 
-import "base:runtime"
 import "core:log"
-import "core:fmt"
 import "core:c"
 import "core:os"
 import "core:path/filepath"
@@ -47,12 +45,12 @@ LaunchOrShowRenderdocUI :: proc(rdoc_api: rawptr) {
 	defer delete(capture_file_path, context.temp_allocator)
 	capture_file_path_len: u32
 
-	if rdoc.GetCapture(rdoc_api, latest_capture_index, transmute(cstring)raw_data(capture_file_path), &capture_file_path_len, &timestamp) != 0 {
+	if rdoc.GetCapture(rdoc_api, latest_capture_index, cast(cstring) raw_data(capture_file_path), &capture_file_path_len, &timestamp) != 0 {
 		assert(capture_file_path_len < 512, "too long capture path!!")
 		current_directory := os.get_current_directory(context.temp_allocator)
 		defer delete(current_directory, context.temp_allocator)
 	
-		abs_capture_path := filepath.join([]string{current_directory, transmute(string)capture_file_path}, context.temp_allocator)
+		abs_capture_path := filepath.join([]string{current_directory, cast(string) capture_file_path}, context.temp_allocator)
 		defer delete(abs_capture_path, context.temp_allocator)
 
 		log.infof("loading latest capture: %v", abs_capture_path)
@@ -60,7 +58,7 @@ LaunchOrShowRenderdocUI :: proc(rdoc_api: rawptr) {
 		if rdoc.IsTargetControlConnected(rdoc_api) {
 			rdoc.ShowReplayUI(rdoc_api)
 		} else {
-			pid := rdoc.LaunchReplayUI(rdoc_api, 1, transmute(cstring)raw_data(abs_capture_path))
+			pid := rdoc.LaunchReplayUI(rdoc_api, 1, cast(cstring) raw_data(abs_capture_path))
 			if pid == 0 {
 				log.error("couldn't launch Renderdoc UI")
 				return
@@ -89,7 +87,7 @@ main :: proc() {
 	rdoc.SetCaptureFilePathTemplate(rdoc_api, "captures/capture.rdc")
 
 	// uncomment if you want to disable default behaviour of renderdoc capture keys
-	// rdoc.SetCaptureKeys(rdoc_api, nil, 0)
+	rdoc.SetCaptureKeys(rdoc_api, {})
 	
 	if !glfw.Init() {
 		return
@@ -164,7 +162,7 @@ main :: proc() {
 		}
 	`
 
-	program_id, ok := gl.load_shaders_source(vssource, fssource)
+	program_id, _ := gl.load_shaders_source(vssource, fssource)
 
 	gl.UseProgram(program_id)
 
@@ -204,15 +202,17 @@ main :: proc() {
 				rdoc_stage = .LaunchUI
 			}
 
-			// use PushDebugGroup to get custom grouping in renderdoc
-			gl.PushDebugGroup(gl.DEBUG_SOURCE_APPLICATION, 0, len("CUSTOM GROUP"), "CUSTOM GROUP")
-			defer gl.PopDebugGroup()
-			
-			gl.Clear(gl.COLOR_BUFFER_BIT)
-			
-			gl.BindVertexArray(vao)
-			gl.DrawElements(gl.TRIANGLES, cast(i32)len(indices), gl.UNSIGNED_INT, nil)
-	
+			{
+				// use PushDebugGroup to get custom grouping in renderdoc
+				gl.PushDebugGroup(gl.DEBUG_SOURCE_APPLICATION, 0, len("CUSTOM GROUP"), "CUSTOM GROUP")
+				defer gl.PopDebugGroup()
+
+				gl.Clear(gl.COLOR_BUFFER_BIT)
+				
+				gl.BindVertexArray(vao)
+				gl.DrawElements(gl.TRIANGLES, cast(i32)len(indices), gl.UNSIGNED_INT, nil)
+			}
+
 			glfw.SwapBuffers(window_handle)
 		}
 

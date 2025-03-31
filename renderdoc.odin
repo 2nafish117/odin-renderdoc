@@ -40,12 +40,12 @@ GetCaptureOptionF32Proc :: #type proc "c" (opt : CaptureOption) -> f32
 // Sets which key or keys can be used to toggle focus between multiple windows
 //
 // If keys is NULL or num is 0, toggle keys will be disabled
-SetFocusToggleKeysProc :: #type proc "c" (keys : ^InputButton, num : c.int)
+SetFocusToggleKeysProc :: #type proc "c" (keys : [^]InputButton, num : c.int)
 
 // Sets which key or keys can be used to capture the next frame
 //
 // If keys is NULL or num is 0, captures keys will be disabled
-SetCaptureKeysProc :: #type proc "c" (keys : ^InputButton, num : c.int)
+SetCaptureKeysProc :: #type proc "c" (keys : [^]InputButton, num : c.int)
 
 // returns the overlay bits that have been set
 GetOverlayBitsProc :: #type proc "c" () -> u32
@@ -170,7 +170,7 @@ WindowHandle :: rawptr
 // pointer-sized object in the memory pointed to by the VkInstance. Thus we cast to a void** and
 // indirect once.
 DEVICEPOINTER_FROM_VKINSTANCE :: proc "c" (inst: vk.Instance) -> DevicePointer {
-	return cast(DevicePointer) ((cast(^rawptr)inst)^)
+	return (cast(^rawptr)inst)^
 }
 
 SetActiveWindowProc :: #type proc "c" (device : DevicePointer, wndHandle : WindowHandle)
@@ -481,33 +481,33 @@ Version :: enum i32 {
 }
 
 API_1_6_0 :: struct {
-    GetAPIVersion : GetAPIVersionProc,
-    SetCaptureOptionU32 : SetCaptureOptionU32Proc,
-    SetCaptureOptionF32 : SetCaptureOptionF32Proc,
-    GetCaptureOptionU32 : GetCaptureOptionU32Proc,
-    GetCaptureOptionF32 : GetCaptureOptionF32Proc,
-    SetFocusToggleKeys : SetFocusToggleKeysProc,
-    SetCaptureKeys : SetCaptureKeysProc,
-    GetOverlayBits : GetOverlayBitsProc,
-    MaskOverlayBits : MaskOverlayBitsProc,
-    RemoveHooks : RemoveHooksProc,
-    UnloadCrashHandler : UnloadCrashHandlerProc,
-    SetCaptureFilePathTemplate : SetCaptureFilePathTemplateProc,
-    GetCaptureFilePathTemplate : GetCaptureFilePathTemplateProc,
-    GetNumCaptures : GetNumCapturesProc,
-    GetCapture : GetCaptureProc,
-    TriggerCapture : TriggerCaptureProc,
-    IsTargetControlConnected : IsTargetControlConnectedProc,
-    LaunchReplayUI : LaunchReplayUIProc,
-    SetActiveWindow : SetActiveWindowProc,
-    StartFrameCapture : StartFrameCaptureProc,
-    IsFrameCapturing : IsFrameCapturingProc,
-    EndFrameCapture : EndFrameCaptureProc,
-    TriggerMultiFrameCapture : TriggerMultiFrameCaptureProc,
-    SetCaptureFileComments : SetCaptureFileCommentsProc,
-    DiscardFrameCapture : DiscardFrameCaptureProc,
-    ShowReplayUI : ShowReplayUIProc,
-    SetCaptureTitle : SetCaptureTitleProc,
+	GetAPIVersion : GetAPIVersionProc,
+	SetCaptureOptionU32 : SetCaptureOptionU32Proc,
+	SetCaptureOptionF32 : SetCaptureOptionF32Proc,
+	GetCaptureOptionU32 : GetCaptureOptionU32Proc,
+	GetCaptureOptionF32 : GetCaptureOptionF32Proc,
+	SetFocusToggleKeys : SetFocusToggleKeysProc,
+	SetCaptureKeys : SetCaptureKeysProc,
+	GetOverlayBits : GetOverlayBitsProc,
+	MaskOverlayBits : MaskOverlayBitsProc,
+	RemoveHooks : RemoveHooksProc,
+	UnloadCrashHandler : UnloadCrashHandlerProc,
+	SetCaptureFilePathTemplate : SetCaptureFilePathTemplateProc,
+	GetCaptureFilePathTemplate : GetCaptureFilePathTemplateProc,
+	GetNumCaptures : GetNumCapturesProc,
+	GetCapture : GetCaptureProc,
+	TriggerCapture : TriggerCaptureProc,
+	IsTargetControlConnected : IsTargetControlConnectedProc,
+	LaunchReplayUI : LaunchReplayUIProc,
+	SetActiveWindow : SetActiveWindowProc,
+	StartFrameCapture : StartFrameCaptureProc,
+	IsFrameCapturing : IsFrameCapturingProc,
+	EndFrameCapture : EndFrameCaptureProc,
+	TriggerMultiFrameCapture : TriggerMultiFrameCaptureProc,
+	SetCaptureFileComments : SetCaptureFileCommentsProc,
+	DiscardFrameCapture : DiscardFrameCaptureProc,
+	ShowReplayUI : ShowReplayUIProc,
+	SetCaptureTitle : SetCaptureTitleProc,
 }
 
 API_1_0_0 :: API_1_6_0
