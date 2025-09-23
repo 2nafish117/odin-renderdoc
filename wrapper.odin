@@ -9,10 +9,19 @@ import "core:os"
 
 LOAD_RENDERDOC :: #config(LOAD_RENDERDOC, true)
 
+when ODIN_OS == .Linux {
+	RENDERDOC_DEFAULT_INSTALL_ROOT :: "~/.local/share/applications/renderdoc/lib"
+	RENDERDOC_LIB_NAME :: "librenderdoc.so"
+}
+else {
+	RENDERDOC_DEFAULT_INSTALL_ROOT :: "C:/Program Files/RenderDoc"
+	RENDERDOC_LIB_NAME :: "renderdoc.dll"
+}
+
 // utility to load renderdoc, pass in the path to renderdoc if not installed at the default path
-load_api :: proc(renderdoc_install_root: string = "C:/Program Files/RenderDoc", version: Version = .API_Version_1_6_0) -> (lib: dynlib.Library, rdoc_api: rawptr, ok: bool) {
+load_api :: proc(renderdoc_install_root: string = RENDERDOC_DEFAULT_INSTALL_ROOT, version: Version = .API_Version_1_6_0) -> (lib: dynlib.Library, rdoc_api: rawptr, ok: bool) {
 	when LOAD_RENDERDOC {
-		dll_path := filepath.join([]string{renderdoc_install_root, "renderdoc.dll"}, context.temp_allocator)
+		dll_path := filepath.join([]string{renderdoc_install_root, RENDERDOC_LIB_NAME}, context.temp_allocator)
 		defer delete(dll_path, context.temp_allocator)
 	
 		if !os.exists(renderdoc_install_root) {
