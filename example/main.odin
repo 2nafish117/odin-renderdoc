@@ -47,10 +47,12 @@ LaunchOrShowRenderdocUI :: proc(rdoc_api: rawptr) {
 
 	if rdoc.GetCapture(rdoc_api, latest_capture_index, cast(cstring) raw_data(capture_file_path), &capture_file_path_len, &timestamp) != 0 {
 		assert(capture_file_path_len < 512, "too long capture path!!")
-		current_directory := os.get_current_directory(context.temp_allocator)
+		
+		current_directory, err := os.get_working_directory(context.temp_allocator)
+		assert(err == nil)
 		defer delete(current_directory, context.temp_allocator)
 	
-		abs_capture_path := filepath.join([]string{current_directory, cast(string) capture_file_path}, context.temp_allocator)
+		abs_capture_path, _ := filepath.join([]string{current_directory, cast(string) capture_file_path}, context.temp_allocator)
 		defer delete(abs_capture_path, context.temp_allocator)
 
 		log.infof("loading latest capture: %v", abs_capture_path)
@@ -73,8 +75,9 @@ LaunchOrShowRenderdocUI :: proc(rdoc_api: rawptr) {
 main :: proc() {
 	context.logger = log.create_console_logger()
 
-	// pass in the path to renderdoc if not installed in default location of "C:/Program Files/RenderDoc"
-	rdoc_lib, rdoc_api, rdoc_ok := rdoc.load_api(/*"C:/Program Files/RenderDoc"*/)
+	// pass in the path to renderdoc if not installed in default location of "C:/Program Files/RenderDoc" on windows
+	// and ~/.local/share/applications/renderdoc/lib on linux 
+	rdoc_lib, rdoc_api, rdoc_ok := rdoc.load_api()
 	// cast to a specific api struct to directly use the api, without the wrapper
 	// typed_rdoc_api := cast(^rdoc.API_1_6_0) rdoc_api
 	if rdoc_ok {
